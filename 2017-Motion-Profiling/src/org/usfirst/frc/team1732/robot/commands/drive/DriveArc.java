@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.commands;
+package org.usfirst.frc.team1732.robot.commands.drive;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
@@ -18,9 +18,9 @@ public class DriveArc extends Command {
     public DriveArc(double distance, double radius, double velocity, double acceleration, boolean goLeft) {
 	super();
 	this.distance = distance;
-	this.radius = radius;
-	this.velocity = Math.min(velocity, Drivetrain.MAX_ALLOWED_VELOCITY);
-	this.acceleration = Math.min(acceleration, Drivetrain.MAX_ALLOWED_ACCELERATION);
+	this.radius = Math.abs(radius);
+	this.velocity = Math.abs(Math.min(velocity, Drivetrain.MAX_ALLOWED_VELOCITY));
+	this.acceleration = Math.abs(Math.min(acceleration, Drivetrain.MAX_ALLOWED_ACCELERATION));
 	this.goLeft = goLeft;
     }
 
@@ -34,6 +34,10 @@ public class DriveArc extends Command {
 	double outerDistance = percentDriven * circumference(outerRadius);
 	double innerDistance = percentDriven * circumference(innerRadius);
 
+	if (innerRadius < Drivetrain.ROBOT_WIDTH_INCHES / 2.0) {
+	    innerDistance = -innerDistance;
+	}
+
 	double outerVelocity = velocity;
 	double outerAcceleration = acceleration;
 
@@ -43,7 +47,20 @@ public class DriveArc extends Command {
 	double innerVelocity = angularCruiseVelocity * circumference(innerRadius);
 	double innerAcceleration = angularAcceleration * circumference(innerRadius);
 
-	robot.drivetrain.changeToMotionMagic();
+	/*
+	 * theoretically, if java were doing algebra this wouldn't be needed
+	 * because infinities would cancel out, but java variables don't hold
+	 * algebra so that doesn't work.
+	 */
+	if (radius == Double.POSITIVE_INFINITY) {
+	    outerRadius = radius;
+	    innerRadius = radius;
+	    innerDistance = distance;
+	    outerDistance = distance;
+	    innerVelocity = outerVelocity;
+	    innerAcceleration = outerAcceleration;
+	}
+
 	if (goLeft) {
 	    robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(innerVelocity);
 	    robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(innerAcceleration);
@@ -63,6 +80,8 @@ public class DriveArc extends Command {
 	    robot.drivetrain.motionMagic.right.setSetpoint(innerDistance);
 	    robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(outerAcceleration);
 	}
+	robot.drivetrain.motionMagic.resetPositions();
+	robot.drivetrain.changeToMotionMagic();
     }
 
     // Make this return true when this Command no longer needs to run execute()

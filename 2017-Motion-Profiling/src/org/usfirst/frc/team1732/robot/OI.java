@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1732.robot;
 
-import org.usfirst.frc.team1732.robot.commands.PrintDriveData;
-import org.usfirst.frc.team1732.robot.commands.ToggleDriveMode;
+import org.usfirst.frc.team1732.robot.commands.joystickcommands.PrintDriveData;
+import org.usfirst.frc.team1732.robot.commands.joystickcommands.ToggleDriveMode;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;

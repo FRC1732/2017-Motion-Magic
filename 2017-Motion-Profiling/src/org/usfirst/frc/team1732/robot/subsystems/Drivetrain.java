@@ -2,7 +2,7 @@ package org.usfirst.frc.team1732.robot.subsystems;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.RobotMap;
-import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveWithJoysticks;
 import org.usfirst.frc.team1732.robot.subsystems.motionmagic.MotionMagicPair;
 import org.usfirst.frc.team1732.robot.subsystems.motionmagic.MotionMagicUnit;
 
