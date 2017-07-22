@@ -41,11 +41,15 @@ public class DriveArc extends Command {
 	double outerVelocity = velocity;
 	double outerAcceleration = acceleration;
 
-	double angularCruiseVelocity = outerVelocity / circumference(outerRadius);
-	double angularAcceleration = outerAcceleration / circumference(outerRadius);
+	double rotationalCruiseVelocity = outerVelocity / circumference(outerRadius);
+	double rotationalAcceleration = outerAcceleration / circumference(outerRadius);
 
-	double innerVelocity = angularCruiseVelocity * circumference(innerRadius);
-	double innerAcceleration = angularAcceleration * circumference(innerRadius);
+	// unused but I think having these here improves understanding
+	double angularCruiseVelocity = rotationalCruiseVelocity * 2 * Math.PI;
+	double angularAcceleration = rotationalAcceleration * 2 * Math.PI;
+
+	double innerVelocity = rotationalCruiseVelocity * circumference(innerRadius);
+	double innerAcceleration = rotationalAcceleration * circumference(innerRadius);
 
 	/*
 	 * theoretically, if java were doing algebra this wouldn't be needed
