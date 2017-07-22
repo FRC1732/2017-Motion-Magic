@@ -3,6 +3,8 @@ package org.usfirst.frc.team1732.robot.subsystems;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.RobotMap;
 import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
+import org.usfirst.frc.team1732.robot.subsystems.motionmagic.MotionMagicPair;
+import org.usfirst.frc.team1732.robot.subsystems.motionmagic.MotionMagicUnit;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
@@ -46,6 +48,9 @@ public class Drivetrain extends Subsystem {
 
     public static final boolean REVERSE_LEFT_ENCODER = true;
     public static final boolean REVERSE_RIGHT_ENCODER = false;
+
+    public static final double MAX_ALLOWED_VELOCITY = 0; // RMP
+    public static final double MAX_ALLOWED_ACCELERATION = 0; // RMP/sec
 
     public static final double MAX_LEFT_RPM = 0;
     public static final double MAX_RIGHT_RPM = 0;

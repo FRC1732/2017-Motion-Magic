@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.subsystems;
+package org.usfirst.frc.team1732.robot.subsystems.motionmagic;
 
 public class MotionMagicPair {
 

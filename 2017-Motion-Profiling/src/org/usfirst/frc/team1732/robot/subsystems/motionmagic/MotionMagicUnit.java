@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.subsystems;
+package org.usfirst.frc.team1732.robot.subsystems.motionmagic;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
