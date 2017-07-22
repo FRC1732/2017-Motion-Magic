@@ -8,4 +8,7 @@ package org.usfirst.frc.team1732.robot;
  */
 public class RobotMap {
 
+    public static final int LEFT_JOYSTICK_USB = 2;
+    public static final int RIGHT_JOYSTICK_USB = 1;
+
 }
