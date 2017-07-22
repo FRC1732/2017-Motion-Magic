@@ -36,7 +36,7 @@ public class Drivetrain extends Subsystem {
     private MotionMagicUnit leftMM;
     private MotionMagicUnit rightMM;
 
-    public static final double MAX_VOLTAGE = 12;
+    public static final double MAX_VOLTAGE = 12; // volts
 
     public static final int DEFAULT_PROFILE = 0;
 
@@ -52,13 +52,13 @@ public class Drivetrain extends Subsystem {
 
     public static final CANTalon.VelocityMeasurementPeriod VELOCITY_MEASUREMENT_PERIOD = CANTalon.VelocityMeasurementPeriod.Period_1Ms;
     public static final int VELOCITY_MEASUREMENT_WINDOW = 10; // ms
-    public static final int ALLOWED_ERROR = 3; // give in inches
-    public static final double CLOSED_LOOP_RAMP_RATE = 0;
-    // need to check what units CLOSED_LOOP_RAMP_RATE is in (I think 0 - 2013);
-    public static final int IZONE = 0;
+    public static final int ALLOWED_ERROR = 0; // give in inches
+    public static final int IZONE = 0; // give in inches
+    public static final double CLOSED_LOOP_RAMP_RATE = MAX_VOLTAGE * 4;
+    // ^ volts per second
 
-    public static final double DEFAULT_ACCELERATION = 0;
-    public static final double DEFAULT_VELOCITY = 0;
+    public static final double DEFAULT_ACCELERATION = 0; // RPM per second
+    public static final double DEFAULT_VELOCITY = 0; // RPM
 
     public Drivetrain() {
 	super(NAME);
@@ -86,48 +86,39 @@ public class Drivetrain extends Subsystem {
 	right2.changeControlMode(TalonControlMode.Follower);
 	right2.set(rightMaster.getDeviceID());
 
-	leftMaster.setVoltageCompensationRampRate(24.0);
-	rightMaster.setVoltageCompensationRampRate(24.0);
+	leftMaster.setVoltageCompensationRampRate(MAX_VOLTAGE * 2);
+	rightMaster.setVoltageCompensationRampRate(MAX_VOLTAGE * 2);
+	// ^ apparently above units are volts per 100 ms
 
 	changeToPercentVBus();
     }
 
     private void configureTalonEncoders() {
-	leftMaster.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-	rightMaster.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-
-	leftMaster.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 20);
-	rightMaster.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 20);
-
-	// leftMaster.SetVelocityMeasurementPeriod(VELOCITY_MEASUREMENT_PERIOD);
-	// rightMaster.SetVelocityMeasurementPeriod(VELOCITY_MEASUREMENT_PERIOD);
-	//
-	// leftMaster.SetVelocityMeasurementWindow(VELOCITY_MEASUREMENT_WINDOW);
-	// rightMaster.SetVelocityMeasurementWindow(VELOCITY_MEASUREMENT_WINDOW);
-	//
-	// leftMaster.setAllowableClosedLoopErr(ALLOWED_ERROR / INCHES_PER_REV);
-	// rightMaster.setAllowableClosedLoopErr(ALLOWED_ERROR /
-	// INCHES_PER_REV);
-
-	leftMaster.configEncoderCodesPerRev(ENCODER_CODES_PER_REV);
-	rightMaster.configEncoderCodesPerRev(ENCODER_CODES_PER_REV);
-
-	leftMaster.reverseSensor(REVERSE_LEFT_ENCODER);
-	rightMaster.reverseSensor(REVERSE_RIGHT_ENCODER);
-
-	leftMaster.configNominalOutputVoltage(+0.0f, -0.0f);
-	rightMaster.configNominalOutputVoltage(+0.0f, -0.0f);
-
-	leftMaster.configPeakOutputVoltage(+12.0f, -12.0f);
-	rightMaster.configPeakOutputVoltage(+12.0f, -12.0f);
-
-	leftMaster.setProfile(DEFAULT_PROFILE);
-	rightMaster.setProfile(DEFAULT_PROFILE);
+	configureATalonEncoder(leftMaster, REVERSE_LEFT_ENCODER, DEFAULT_PROFILE);
+	configureATalonEncoder(rightMaster, REVERSE_RIGHT_ENCODER, DEFAULT_PROFILE);
 
 	setMotionMagicPID();
 
 	leftMM = new MotionMagicUnit("Left", leftMaster, INCHES_PER_REV, ALLOWED_ERROR);
 	rightMM = new MotionMagicUnit("Right", rightMaster, INCHES_PER_REV, ALLOWED_ERROR);
+    }
+
+    private void configureATalonEncoder(CANTalon talon, boolean reverseSensor, int defaultProfile) {
+	talon.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+	talon.setStatusFrameRateMs(StatusFrameRate.QuadEncoder, 20);
+	// talon.SetVelocityMeasurementPeriod(VELOCITY_MEASUREMENT_PERIOD);
+	// talon.SetVelocityMeasurementWindow(VELOCITY_MEASUREMENT_WINDOW);
+	int allowedError = (int) inchesToEncoderTicks(ALLOWED_ERROR);
+	talon.setAllowableClosedLoopErr(allowedError);
+	talon.configEncoderCodesPerRev(ENCODER_CODES_PER_REV);
+	talon.reverseSensor(reverseSensor);
+	talon.configNominalOutputVoltage(+0.0f, -0.0f);
+	talon.configPeakOutputVoltage(+MAX_VOLTAGE, -MAX_VOLTAGE);
+	talon.setNominalClosedLoopVoltage(MAX_VOLTAGE);
+	// this ^ does the same thing for closed loop as what voltage
+	// compensation mode does for teleop
+
+	talon.setProfile(defaultProfile);
     }
 
     private void setMotionMagicPID() {
@@ -206,7 +197,32 @@ public class Drivetrain extends Subsystem {
 
     private void printData(String name, CANTalon talon) {
 	System.out.println(name + " firmware version: " + talon.GetFirmwareVersion());
-	System.out.println(name + " is encoder present? " + talon.isSensorPresent(FeedbackDevice.QuadEncoder));
+	// System.out.println(name + " is encoder present? " +
+	// talon.isSensorPresent(FeedbackDevice.QuadEncoder));
+    }
+
+    private double encoderTicksToRev(double ticks) {
+	return ticks / ENCODER_CODES_PER_REV;
+    }
+
+    private double revToInches(double rev) {
+	return INCHES_PER_REV * rev;
+    }
+
+    private double inchesToRev(double inches) {
+	return inches / INCHES_PER_REV;
+    }
+
+    private double revToEncoderTicks(double rev) {
+	return rev * ENCODER_CODES_PER_REV;
+    }
+
+    private double encoderTicksToInches(double ticks) {
+	return revToInches(encoderTicksToRev(ticks));
+    }
+
+    private double inchesToEncoderTicks(double inches) {
+	return revToEncoderTicks(inchesToRev(inches));
     }
 
 }
