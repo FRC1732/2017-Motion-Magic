@@ -37,11 +37,11 @@ public class DriveArc extends Command {
 	double outerVelocity = velocity;
 	double outerAcceleration = acceleration;
 
-	// calculate these numbers so that both sides have the same angular
-	// velocity throughout the turn
+	double angularCruiseVelocity = outerVelocity / circumference(outerRadius);
+	double angularAcceleration = outerAcceleration / circumference(outerRadius);
 
-	double innerVelocity = 1;
-	double innerAcceleration = 1;
+	double innerVelocity = angularCruiseVelocity * circumference(innerRadius);
+	double innerAcceleration = angularAcceleration * circumference(innerRadius);
 
 	robot.drivetrain.changeToMotionMagic();
 	if (goLeft) {
