@@ -53,7 +53,7 @@ public class Drivetrain extends Subsystem {
     public static final CANTalon.VelocityMeasurementPeriod VELOCITY_MEASUREMENT_PERIOD = CANTalon.VelocityMeasurementPeriod.Period_1Ms;
     public static final int VELOCITY_MEASUREMENT_WINDOW = 10; // ms
     public static final int ALLOWED_ERROR = 3; // give in inches
-    public static final double CLOSED_LOOP_RAMP_RATE = 1023 * 1.0;
+    public static final double CLOSED_LOOP_RAMP_RATE = 0;
     // need to check what units CLOSED_LOOP_RAMP_RATE is in (I think 0 - 2013);
     public static final int IZONE = 0;
 
