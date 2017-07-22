@@ -19,8 +19,8 @@ public class DriveArc extends Command {
 	super();
 	this.distance = distance;
 	this.radius = Math.abs(radius);
-	this.velocity = Math.abs(Math.min(velocity, Drivetrain.MAX_ALLOWED_VELOCITY));
-	this.acceleration = Math.abs(Math.min(acceleration, Drivetrain.MAX_ALLOWED_ACCELERATION));
+	this.velocity = Math.min(Math.abs(velocity), Drivetrain.MAX_ALLOWED_VELOCITY);
+	this.acceleration = Math.min(Math.abs(acceleration), Drivetrain.MAX_ALLOWED_ACCELERATION);
 	this.goLeft = goLeft;
     }
 
