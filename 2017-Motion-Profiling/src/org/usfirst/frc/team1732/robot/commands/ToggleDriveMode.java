@@ -11,8 +11,9 @@ public class ToggleDriveMode extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-	if (robot.isEnabled() && robot.isOperatorControl())
+	if (robot.isEnabled() && robot.isOperatorControl()) {
 	    robot.drivetrain.changeToVoltageMode();
+	}
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -86,6 +86,9 @@ public class Drivetrain extends Subsystem {
 	right2.changeControlMode(TalonControlMode.Follower);
 	right2.set(rightMaster.getDeviceID());
 
+	leftMaster.setVoltageCompensationRampRate(24.0);
+	rightMaster.setVoltageCompensationRampRate(24.0);
+
 	changeToPercentVBus();
     }
 
