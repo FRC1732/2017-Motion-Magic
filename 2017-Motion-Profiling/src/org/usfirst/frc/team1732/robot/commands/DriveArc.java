@@ -45,20 +45,22 @@ public class DriveArc extends Command {
 
 	robot.drivetrain.changeToMotionMagic();
 	if (goLeft) {
-	    robot.drivetrain.motionMagic.left.setSetpoint(innerDistance);
 	    robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(innerVelocity);
 	    robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(innerAcceleration);
 
-	    robot.drivetrain.motionMagic.right.setSetpoint(outerDistance);
 	    robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(outerVelocity);
 	    robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(outerAcceleration);
+
+	    robot.drivetrain.motionMagic.left.setSetpoint(innerDistance);
+	    robot.drivetrain.motionMagic.right.setSetpoint(outerDistance);
 	} else {
-	    robot.drivetrain.motionMagic.right.setSetpoint(innerDistance);
 	    robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(innerVelocity);
 	    robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(innerAcceleration);
 
 	    robot.drivetrain.motionMagic.left.setSetpoint(outerDistance);
 	    robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(outerVelocity);
+
+	    robot.drivetrain.motionMagic.right.setSetpoint(innerDistance);
 	    robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(outerAcceleration);
 	}
     }
