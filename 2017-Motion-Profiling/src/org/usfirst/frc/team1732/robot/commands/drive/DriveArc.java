@@ -34,13 +34,18 @@ public class DriveArc extends Command {
 	double outerDistance = percentDriven * circumference(outerRadius);
 	double innerDistance = percentDriven * circumference(innerRadius);
 
-	if (innerRadius < Drivetrain.ROBOT_WIDTH_INCHES / 2.0) {
+	if (radius < Drivetrain.ROBOT_WIDTH_INCHES / 2.0) {
 	    innerDistance = -innerDistance;
 	}
 
 	double outerVelocity = velocity;
 	double outerAcceleration = acceleration;
 
+	/*
+	 * velocity and acceleration don't need to be converted to inch/min and
+	 * inch/min/sec even though the circumference is inches because later
+	 * they would be converted back to RPM and RPM/sec anyways
+	 */
 	double rotationalCruiseVelocity = outerVelocity / circumference(outerRadius);
 	double rotationalAcceleration = outerAcceleration / circumference(outerRadius);
 
