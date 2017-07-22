@@ -63,6 +63,10 @@ public class MotionMagicUnit {
 	return talon.getSpeed();
     }
 
+    public double getPosition() {
+	return talon.getPosition();
+    }
+
     private int prints = 0;
 
     public void graphData() {
