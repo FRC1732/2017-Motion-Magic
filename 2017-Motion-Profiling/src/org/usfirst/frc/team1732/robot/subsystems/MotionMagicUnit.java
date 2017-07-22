@@ -68,7 +68,7 @@ public class MotionMagicUnit {
     public void graphData() {
 	double vel = talon.getSpeed();
 	double position = talon.getPosition();
-	double throttle = (talon.getOutputVoltage() / talon.getBusVoltage()) * 1023;
+	double throttle = (talon.getOutputVoltage() / 12.0) * 1023;
 	double current = talon.getOutputCurrent();
 	double error = talon.getClosedLoopError();
 	double setpoint = talon.getSetpoint();
