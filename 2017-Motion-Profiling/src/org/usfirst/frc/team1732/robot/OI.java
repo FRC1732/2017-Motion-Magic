@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1732.robot;
 
+import org.usfirst.frc.team1732.robot.commands.PrintDriveData;
 import org.usfirst.frc.team1732.robot.commands.ToggleDriveMode;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,20 +19,18 @@ public class OI {
 
     private final int trigger = 1;
     private JoystickButton drivingMode = new JoystickButton(left, trigger);
+    private JoystickButton printData = new JoystickButton(right, trigger);
 
     public OI() {
-	drivingMode.toggleWhenActive(new ToggleDriveMode());
+	drivingMode.toggleWhenPressed(new ToggleDriveMode());
+	printData.toggleWhenPressed(new PrintDriveData());
     }
 
     public double getLeftSpeed() {
-	double l = left.getY();
-	System.out.println("Left Joystick: " + l);
-	return l;
+	return left.getY();
     }
 
     public double getRightSpeed() {
-	double r = right.getY();
-	System.out.println("Right Joystick: " + r);
-	return r;
+	return right.getY();
     }
 }
