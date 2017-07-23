@@ -45,7 +45,7 @@ public class DriveTimeTest extends Command {
     private int timesDone = 0;
     private int index = 0;
     /*
-     * 3 slots because it's storing 3 max accelerations
+     * length 3 arrays because it's storing 3 max accelerations
      * 
      * spot 0 holds a length 1 secant line calculation (uses index and index - 1
      * for acceleration calculation)
