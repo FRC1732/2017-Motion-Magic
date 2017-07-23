@@ -100,8 +100,8 @@ public class DriveTimeTest extends Command {
 	System.out.println("Left Max: " + leftMaxVel);
 	System.out.println("Right Max: " + rightMaxVel);
 	System.out.println("Drive Time Max Accelerations");
-	System.out.printf("Left: %.3f, %.3f, %.3f%n");
-	System.out.printf("Right: %.3f, %.3f, %.3f%n");
+	System.out.printf("Left: %.3f, %.3f, %.3f%n", leftMaxAccel[0], leftMaxAccel[1], leftMaxAccel[2]);
+	System.out.printf("Right: %.3f, %.3f, %.3f%n", rightMaxAccel[0], rightMaxAccel[1], rightMaxAccel[2]);
 	robot.drivetrain.driveWithJoysticks(0, 0);
     }
 
