@@ -57,9 +57,9 @@ public class DriveArc extends Command {
 	double innerAcceleration = rotationalAcceleration * circumference(innerRadius);
 
 	/*
-	 * theoretically, if java were doing algebra this wouldn't be needed
-	 * because infinities would cancel out, but java variables don't hold
-	 * algebra so that doesn't work.
+	 * theoretically, if we did the limit as radius approached infinity all
+	 * the infinite radius stuff would cancel out and this if block wouldn't
+	 * be needed, but java doesn't work like that
 	 */
 	if (radius == Double.POSITIVE_INFINITY) {
 	    outerRadius = radius;
