@@ -3,11 +3,11 @@ package org.usfirst.frc.team1732.robot.commands.drive;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
+import com.ctre.CANTalon.TalonControlMode;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 public class DriveArc extends Command {
-
-    private final Robot robot = Robot.getInstance();
 
     private final double distance;
     private final double radius;
@@ -71,35 +71,41 @@ public class DriveArc extends Command {
 	}
 
 	if (goLeft) {
-	    robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(innerVelocity);
-	    robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(innerAcceleration);
+	    Robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(innerVelocity);
+	    Robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(innerAcceleration);
 
-	    robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(outerVelocity);
-	    robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(outerAcceleration);
+	    Robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(outerVelocity);
+	    Robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(outerAcceleration);
 
-	    robot.drivetrain.motionMagic.left.setSetpoint(innerDistance);
-	    robot.drivetrain.motionMagic.right.setSetpoint(outerDistance);
+	    Robot.drivetrain.motionMagic.left.setSetpoint(innerDistance);
+	    Robot.drivetrain.motionMagic.right.setSetpoint(outerDistance);
 	} else {
-	    robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(innerVelocity);
-	    robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(innerAcceleration);
+	    Robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(innerVelocity);
+	    Robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(innerAcceleration);
 
-	    robot.drivetrain.motionMagic.left.setSetpoint(outerDistance);
-	    robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(outerVelocity);
+	    Robot.drivetrain.motionMagic.left.setSetpoint(outerDistance);
+	    Robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(outerVelocity);
 
-	    robot.drivetrain.motionMagic.right.setSetpoint(innerDistance);
-	    robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(outerAcceleration);
+	    Robot.drivetrain.motionMagic.right.setSetpoint(innerDistance);
+	    Robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(outerAcceleration);
 	}
-	robot.drivetrain.motionMagic.resetPositions();
-	robot.drivetrain.changeToMotionMagic();
+	Robot.drivetrain.motionMagic.resetPositions();
+	Robot.drivetrain.setControlMode(TalonControlMode.MotionMagic);
+    }
+
+    public static double circumference(double r) {
+	return Math.PI * r * 2;
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     protected boolean isFinished() {
-	return robot.drivetrain.motionMagic.onTarget();
+	return Robot.drivetrain.motionMagic.onTarget();
     }
 
-    private double circumference(double r) {
-	return Math.PI * r * 2;
+    @Override
+    protected void end() {
+	Robot.drivetrain.setControlMode(TalonControlMode.Voltage);
+
     }
 }

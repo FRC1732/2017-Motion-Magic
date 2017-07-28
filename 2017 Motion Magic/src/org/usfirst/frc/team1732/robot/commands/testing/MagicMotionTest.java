@@ -3,15 +3,16 @@ package org.usfirst.frc.team1732.robot.commands.testing;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
+import com.ctre.CANTalon.TalonControlMode;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 public class MagicMotionTest extends Command {
 
     private static boolean forward = true;
-    private Robot robot = Robot.getInstance();
 
     public MagicMotionTest(double setpoint) {
-	requires(robot.drivetrain);
+	requires(Robot.drivetrain);
 	this.setpoint = forward ? setpoint : -setpoint;
 	forward = !forward;
     }
@@ -24,17 +25,17 @@ public class MagicMotionTest extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-	robot.drivetrain.changeToMotionMagic();
-	robot.drivetrain.motionMagic.setMotionMagicAcceleration(acceleration);
-	robot.drivetrain.motionMagic.setMotionMagicCruiseVelocity(velocity);
-	robot.drivetrain.motionMagic.setSetpoint(setpoint);
-	robot.drivetrain.motionMagic.resetPositions();
+	Robot.drivetrain.setControlMode(TalonControlMode.MotionMagic);
+	Robot.drivetrain.motionMagic.setMotionMagicAcceleration(acceleration);
+	Robot.drivetrain.motionMagic.setMotionMagicCruiseVelocity(velocity);
+	Robot.drivetrain.motionMagic.setSetpoint(setpoint);
+	Robot.drivetrain.motionMagic.resetPositions();
     }
 
     // Called repeatedly when this Command is scheduled to run
     @Override
     protected void execute() {
-	robot.drivetrain.motionMagic.graphData();
+	Robot.drivetrain.motionMagic.graphData();
     }
 
     @Override
@@ -45,8 +46,8 @@ public class MagicMotionTest extends Command {
     // Called once after isFinished returns true
     @Override
     protected void end() {
-	robot.drivetrain.changeToPercentVBus();
-	robot.drivetrain.driveWithJoysticks(0, 0);
+	Robot.drivetrain.setControlMode(TalonControlMode.Voltage);
+	Robot.drivetrain.drive(0, 0);
     }
 
 }

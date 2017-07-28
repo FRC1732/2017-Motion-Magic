@@ -2,11 +2,12 @@ package org.usfirst.frc.team1732.robot.commands.testing;
 
 import org.usfirst.frc.team1732.robot.Robot;
 
+import com.ctre.CANTalon.TalonControlMode;
+
 import edu.wpi.first.wpilibj.command.Command;
 
 public class DriveTimeTest extends Command {
 
-    private Robot robot = Robot.getInstance();
     private static boolean forward = true;
     private double left;
     private double right;
@@ -18,7 +19,7 @@ public class DriveTimeTest extends Command {
     public DriveTimeTest(double sec, double leftSpeed, double rightSpeed) {
 	// Use requires() here to declare subsystem dependencies
 	// eg. requires(chassis);
-	requires(robot.drivetrain);
+	requires(Robot.drivetrain);
 	setTimeout(sec);
 	int sign = forward ? 1 : -1;
 	left = leftSpeed * sign;
@@ -29,8 +30,8 @@ public class DriveTimeTest extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-	robot.drivetrain.changeToPercentVBus();
-	robot.drivetrain.driveWithJoysticks(left, right);
+	Robot.drivetrain.setControlMode(TalonControlMode.PercentVbus);
+	Robot.drivetrain.drive(left, right);
     }
 
     private double leftMaxVel = 0;
@@ -61,10 +62,10 @@ public class DriveTimeTest extends Command {
     // Called repeatedly when this Command is scheduled to run
     @Override
     protected void execute() {
-	double leftVelocity = Math.abs(robot.drivetrain.motionMagic.left.getVelocity());
+	double leftVelocity = Math.abs(Robot.drivetrain.motionMagic.left.getVelocity());
 	leftMaxVel = Math.max(leftVelocity, leftMaxVel);
 
-	double rightVelocity = Math.abs(robot.drivetrain.motionMagic.right.getVelocity());
+	double rightVelocity = Math.abs(Robot.drivetrain.motionMagic.right.getVelocity());
 	rightMaxVel = Math.max(rightVelocity, rightMaxVel);
 
 	// keep track of max accel
@@ -102,7 +103,8 @@ public class DriveTimeTest extends Command {
 	System.out.println("Drive Time Max Accelerations");
 	System.out.printf("Left: %.3f, %.3f, %.3f%n", leftMaxAccel[0], leftMaxAccel[1], leftMaxAccel[2]);
 	System.out.printf("Right: %.3f, %.3f, %.3f%n", rightMaxAccel[0], rightMaxAccel[1], rightMaxAccel[2]);
-	robot.drivetrain.driveWithJoysticks(0, 0);
+	Robot.drivetrain.drive(0, 0);
+	Robot.drivetrain.setControlMode(TalonControlMode.Voltage);
     }
 
 }

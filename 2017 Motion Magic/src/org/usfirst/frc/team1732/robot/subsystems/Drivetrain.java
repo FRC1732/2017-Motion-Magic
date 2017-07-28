@@ -1,8 +1,7 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.RobotMap;
-import org.usfirst.frc.team1732.robot.commands.drive.DriveWithJoysticks;
+import org.usfirst.frc.team1732.robot.commands.drive.TeleopDrive;
 import org.usfirst.frc.team1732.robot.subsystems.motionmagic.MotionMagicPair;
 import org.usfirst.frc.team1732.robot.subsystems.motionmagic.MotionMagicUnit;
 
@@ -15,8 +14,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Drivetrain extends Subsystem {
 
-    private final RobotMap robotMap = Robot.getInstance().robotMap;
-
     public static final String NAME = "Drive Train";
 
     public static final double ROBOT_WIDTH_INCHES = 26;
@@ -25,20 +22,21 @@ public class Drivetrain extends Subsystem {
     public static final double EFFECTIVE_TURNING_CIRCUMFERENCE = TURNING_CIRCUMFERENCE * 1;
 
     // master is the motor that the other left motors follow
-    private final CANTalon leftMaster = new CANTalon(robotMap.LEFT_MASTER_MOTOR_DEVICE_NUMBER);
-    private final CANTalon left1 = new CANTalon(robotMap.LEFT_1_MOTOR_DEVICE_NUMBER);
-    private final CANTalon left2 = new CANTalon(robotMap.LEFT_2_MOTOR_DEVICE_NUMBER);
+    private final CANTalon leftMaster = new CANTalon(Robot.RobotMap.getLeftMasterMotorDeviceNumber());
+    private final CANTalon left1 = new CANTalon(Robot.RobotMap.getLeft1MotorDeviceNumber());
+    private final CANTalon left2 = new CANTalon(Robot.RobotMap.getLeft2MotorDeviceNumber());
     // right motors
     // master is the motor the other right motors follow
-    private final CANTalon rightMaster = new CANTalon(robotMap.RIGHT_MASTER_MOTOR_DEVICE_NUMBER);
-    private final CANTalon right1 = new CANTalon(robotMap.RIGHT_1_MOTOR_DEVICE_NUMBER);
-    private final CANTalon right2 = new CANTalon(robotMap.RIGHT_2_MOTOR_DEVICE_NUMBER);
+    private final CANTalon rightMaster = new CANTalon(Robot.RobotMap.getRightMasterMotorDeviceNumber());
+    private final CANTalon right1 = new CANTalon(Robot.RobotMap.getRight1MotorDeviceNumber());
+    private final CANTalon right2 = new CANTalon(Robot.RobotMap.getRight2MotorDeviceNumber());
 
     public final MotionMagicPair motionMagic;
     private MotionMagicUnit leftMM;
     private MotionMagicUnit rightMM;
 
     public static final double MAX_VOLTAGE = 12; // volts
+    public static final int MAX_AMPS = 40;
 
     public static final int DEFAULT_PROFILE = 0;
 
@@ -95,7 +93,7 @@ public class Drivetrain extends Subsystem {
 	rightMaster.setVoltageCompensationRampRate(MAX_VOLTAGE * 2);
 	// ^ apparently above units are volts per 100 ms
 
-	changeToPercentVBus();
+	setControlMode(TalonControlMode.Voltage);
     }
 
     private void configureTalonEncoders() {
@@ -119,9 +117,13 @@ public class Drivetrain extends Subsystem {
 	talon.reverseSensor(reverseSensor);
 	talon.configNominalOutputVoltage(+0.0f, -0.0f);
 	talon.configPeakOutputVoltage(+MAX_VOLTAGE, -MAX_VOLTAGE);
+	// talon.setCurrentLimit(MAX_AMPS);
+	// talon.EnableCurrentLimit(true);
 	talon.setNominalClosedLoopVoltage(MAX_VOLTAGE);
-	// this ^ does the same thing for closed loop as what voltage
-	// compensation mode does for teleop
+	/*
+	 * talon.setNominalClosedLoopVoltage does the same thing for closed loop
+	 * as what voltage compensation mode does for teleop
+	 */
 
 	talon.setProfile(defaultProfile);
     }
@@ -133,56 +135,66 @@ public class Drivetrain extends Subsystem {
 	rightMaster.setPID(p = 0, i = 0, d = 0, f = 0, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
     }
 
-    public void changeToMotionMagic() {
-	leftMaster.changeControlMode(TalonControlMode.MotionMagic);
-	rightMaster.changeControlMode(TalonControlMode.MotionMagic);
+    public void setControlMode(TalonControlMode mode) {
+	leftMaster.changeControlMode(mode);
+	rightMaster.changeControlMode(mode);
     }
 
-    public void changeToPercentVBus() {
-	leftMaster.changeControlMode(TalonControlMode.PercentVbus);
-	rightMaster.changeControlMode(TalonControlMode.PercentVbus);
+    public boolean isControlMode(TalonControlMode mode) {
+	return leftMaster.getControlMode().equals(mode) && rightMaster.getControlMode().equals(mode);
     }
 
-    public void changeToVoltageMode() {
-	leftMaster.changeControlMode(TalonControlMode.Voltage);
-	rightMaster.changeControlMode(TalonControlMode.Voltage);
-    }
-
-    public boolean isInMotionMagicMode() {
-	return leftMaster.getControlMode().equals(TalonControlMode.MotionMagic)
-		&& rightMaster.getControlMode().equals(TalonControlMode.MotionMagic);
-    }
-
-    public boolean isInPercentVBusMode() {
-	return leftMaster.getControlMode().equals(TalonControlMode.PercentVbus)
-		&& rightMaster.getControlMode().equals(TalonControlMode.PercentVbus);
-    }
-
-    public boolean isInVoltageMode() {
-	return leftMaster.getControlMode().equals(TalonControlMode.Voltage)
-		&& rightMaster.getControlMode().equals(TalonControlMode.Voltage);
+    public TalonControlMode getControlMode() {
+	return leftMaster.getControlMode(); // both sides should be same
     }
 
     @Override
     public void initDefaultCommand() {
-	setDefaultCommand(new DriveWithJoysticks());
+	setDefaultCommand(new TeleopDrive());
     }
 
-    public void driveWithJoysticks(double left, double right) {
-	tankDrive(left, right);
-    }
+    private double leftPercent;
+    private double rightPercent;
 
     /*
      * Will only try to drive if in the correct mode
      */
-    private void tankDrive(double left, double right) {
-	if (isInPercentVBusMode()) {
+    public void drive(double left, double right) {
+	left = limit(left);
+	right = limit(right);
+	leftPercent = left;
+	rightPercent = right;
+	if (isControlMode(TalonControlMode.PercentVbus)) {
 	    leftMaster.set(left);
 	    rightMaster.set(right);
-	} else if (isInVoltageMode()) {
+	} else if (isControlMode(TalonControlMode.Voltage)) {
 	    leftMaster.set(left * MAX_VOLTAGE);
 	    rightMaster.set(right * MAX_VOLTAGE);
+	} else if (isControlMode(TalonControlMode.Speed)) {
+	    leftMaster.set(left * MAX_ALLOWED_VELOCITY);
+	    rightMaster.set(right * MAX_ALLOWED_VELOCITY);
+	} else if (isControlMode(TalonControlMode.Current)) {
+	    leftMaster.set(left * MAX_AMPS);
+	    rightMaster.set(right * MAX_AMPS);
 	}
+    }
+
+    private double limit(double d) {
+	return d < 0 ? Math.max(d, -1) : Math.min(d, 1);
+    }
+
+    /**
+     * @return the left percent voltage
+     */
+    public double getLeft() {
+	return leftPercent;
+    }
+
+    /**
+     * @return the right percent voltage
+     */
+    public double getRight() {
+	return rightPercent;
     }
 
     public void setBrakeMode(boolean brake) {
