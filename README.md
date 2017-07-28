@@ -1,1 +1,1 @@
-# 2017-Motion-Profiling
+# 2017-Motion-Magic
