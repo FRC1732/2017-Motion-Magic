@@ -1,6 +1,7 @@
 
 package org.usfirst.frc.team1732.robot;
 
+import org.usfirst.frc.team1732.robot.commands.testing.MagicMotionTest;
 import org.usfirst.frc.team1732.robot.oi.OI;
 import org.usfirst.frc.team1732.robot.robotmaps.RobotMap2017;
 import org.usfirst.frc.team1732.robot.robotmaps.RobotMap2017PracticeBot;
@@ -37,7 +38,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
-	autonomousCommand = null; // get selected command
+	autonomousCommand = new MagicMotionTest(80); // get selected command
 	// schedule the autonomous command (example)
 	if (autonomousCommand != null)
 	    autonomousCommand.start();
@@ -50,6 +51,7 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void teleopInit() {
+	Robot.drivetrain.motionMagic.resetPositions();
 	if (autonomousCommand != null)
 	    autonomousCommand.cancel();
     }

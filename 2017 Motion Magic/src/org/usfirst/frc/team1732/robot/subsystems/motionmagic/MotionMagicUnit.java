@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1732.robot.subsystems.motionmagic;
 
+import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
@@ -75,10 +77,12 @@ public class MotionMagicUnit {
 	double throttle = (talon.getOutputVoltage() / 12.0) * 1023;
 	double current = talon.getOutputCurrent();
 	double error = talon.getClosedLoopError();
+	double errorRotations = Drivetrain.encoderTicksToRev(error);
 	double setpoint = talon.getSetpoint();
 	if (prints % 10 == 0) {
-	    String s = String.format("%s: Vel: %.3f, Position: %.2f, Setpoint: %.2f, Error: %.2f, Throttle: %.2f, ",
-		    name, vel, position, setpoint, error, throttle);
+	    String s = String.format(
+		    "%s: Vel: %.3f, Position: %.2f, Setpoint: %.2f, Error: %.2f, Error (Rotations): %.2f, Throttle: %.2f, ",
+		    name, vel, position, setpoint, error, errorRotations, throttle);
 	    System.out.println(s);
 	    prints = 0;
 	} else {

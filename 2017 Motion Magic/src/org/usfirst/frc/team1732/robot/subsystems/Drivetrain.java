@@ -10,6 +10,7 @@ import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.StatusFrameRate;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class Drivetrain extends Subsystem {
@@ -31,6 +32,12 @@ public class Drivetrain extends Subsystem {
     private final CANTalon right1 = new CANTalon(Robot.RobotMap.getRight1MotorDeviceNumber());
     private final CANTalon right2 = new CANTalon(Robot.RobotMap.getRight2MotorDeviceNumber());
 
+    private final Solenoid shifter = new Solenoid(Robot.RobotMap.getPCM_CAN_ID(),
+	    Robot.RobotMap.getShifterSolenoidDeviceNumber());
+
+    public static final boolean HIGH_GEAR = false; // false
+    public static final boolean LOW_GEAR = !HIGH_GEAR;
+
     public final MotionMagicPair motionMagic;
     private MotionMagicUnit leftMM;
     private MotionMagicUnit rightMM;
@@ -47,11 +54,10 @@ public class Drivetrain extends Subsystem {
     public static final boolean REVERSE_LEFT_ENCODER = true;
     public static final boolean REVERSE_RIGHT_ENCODER = false;
 
-    public static final double MAX_ALLOWED_VELOCITY = 0; // RMP
-    public static final double MAX_ALLOWED_ACCELERATION = 0; // RMP/sec
+    public static final double MAX_ALLOWED_VELOCITY = 800; // RMP
+    public static final double MAX_ALLOWED_ACCELERATION = 800; // RPM/sec
 
-    public static final double MAX_LEFT_RPM = 0;
-    public static final double MAX_RIGHT_RPM = 0;
+    public static final double MAX_RPM = 830;
 
     public static final CANTalon.VelocityMeasurementPeriod VELOCITY_MEASUREMENT_PERIOD = CANTalon.VelocityMeasurementPeriod.Period_1Ms;
     public static final int VELOCITY_MEASUREMENT_WINDOW = 10; // ms
@@ -60,8 +66,8 @@ public class Drivetrain extends Subsystem {
     public static final double CLOSED_LOOP_RAMP_RATE = MAX_VOLTAGE * 4;
     // ^ volts per second
 
-    public static final double DEFAULT_ACCELERATION = 0; // RPM per second
-    public static final double DEFAULT_VELOCITY = 0; // RPM
+    public static final double DEFAULT_ACCELERATION = 600; // RPM per second
+    public static final double DEFAULT_VELOCITY = 600; // RPM
 
     public Drivetrain() {
 	super(NAME);
@@ -77,13 +83,14 @@ public class Drivetrain extends Subsystem {
 
     private void configureTalons() {
 	// reverses whole left side
-	leftMaster.setInverted(true);
 	left1.changeControlMode(TalonControlMode.Follower);
 	left1.set(leftMaster.getDeviceID());
 	left2.changeControlMode(TalonControlMode.Follower);
 	left2.set(leftMaster.getDeviceID());
 
 	// sets right motors to follow right master
+	rightMaster.reverseOutput(true);
+	rightMaster.setInverted(true);
 	right1.changeControlMode(TalonControlMode.Follower);
 	right1.set(rightMaster.getDeviceID());
 	right2.changeControlMode(TalonControlMode.Follower);
@@ -92,8 +99,8 @@ public class Drivetrain extends Subsystem {
 	leftMaster.setVoltageCompensationRampRate(MAX_VOLTAGE * 2);
 	rightMaster.setVoltageCompensationRampRate(MAX_VOLTAGE * 2);
 	// ^ apparently above units are volts per 100 ms
-
-	setControlMode(TalonControlMode.Voltage);
+	shifter.set(HIGH_GEAR);
+	setControlMode(TalonControlMode.PercentVbus);
     }
 
     private void configureTalonEncoders() {
@@ -129,10 +136,13 @@ public class Drivetrain extends Subsystem {
     }
 
     private void setMotionMagicPID() {
-	double p, i, d, f;
+	double p = 0.1 * 1023 / 32_000 * 121; // 0.387
+	double i = 0;
+	double d = 0;
+	double f = 1023 / (MAX_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
 	// might have different gains for each side
-	leftMaster.setPID(p = 0, i = 0, d = 0, f = 0, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
-	rightMaster.setPID(p = 0, i = 0, d = 0, f = 0, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	leftMaster.setPID(p, i, d, f, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	rightMaster.setPID(p, i, d, f, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
     }
 
     public void setControlMode(TalonControlMode mode) {
@@ -218,27 +228,27 @@ public class Drivetrain extends Subsystem {
 	// talon.isSensorPresent(FeedbackDevice.QuadEncoder));
     }
 
-    private double encoderTicksToRev(double ticks) {
+    public static double encoderTicksToRev(double ticks) {
 	return ticks / ENCODER_CODES_PER_REV;
     }
 
-    private double revToInches(double rev) {
+    public static double revToInches(double rev) {
 	return INCHES_PER_REV * rev;
     }
 
-    private double inchesToRev(double inches) {
+    public static double inchesToRev(double inches) {
 	return inches / INCHES_PER_REV;
     }
 
-    private double revToEncoderTicks(double rev) {
+    public static double revToEncoderTicks(double rev) {
 	return rev * ENCODER_CODES_PER_REV;
     }
 
-    private double encoderTicksToInches(double ticks) {
+    public static double encoderTicksToInches(double ticks) {
 	return revToInches(encoderTicksToRev(ticks));
     }
 
-    private double inchesToEncoderTicks(double inches) {
+    public static double inchesToEncoderTicks(double inches) {
 	return revToEncoderTicks(inchesToRev(inches));
     }
 

@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class PrintDriveData extends Command {
 
+    protected void init() {
+    }
+
     // Called repeatedly when this Command is scheduled to run
     @Override
     protected void execute() {

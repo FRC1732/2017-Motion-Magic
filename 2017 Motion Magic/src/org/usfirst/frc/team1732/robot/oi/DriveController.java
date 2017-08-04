@@ -110,13 +110,8 @@ public class DriveController {
 	leftStick = new Joystick(leftUSB);
 	rightStick = new Joystick(rightUSB);
 
-	if (isTriggerAxis) {
-	    leftTriggerButton = null;
-	    rightTriggerButton = null;
-	} else {
-	    leftTriggerButton = new JoystickButton(leftStick, leftTrigger);
-	    rightTriggerButton = new JoystickButton(rightStick, rightTrigger);
-	}
+	leftTriggerButton = new JoystickButton(leftStick, leftTrigger);
+	rightTriggerButton = new JoystickButton(rightStick, rightTrigger);
     }
 
     public double getLeftX() {

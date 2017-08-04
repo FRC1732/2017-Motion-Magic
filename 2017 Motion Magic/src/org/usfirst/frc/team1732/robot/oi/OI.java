@@ -10,15 +10,16 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  */
 public class OI {
 
-    public static final DriveController dualJoystick = new DriveController(2, 1, 0, 1, 0, false);
+    public static final DriveController dualJoystick = new DriveController(2, 1, 0, 1, 1, false);
     public static final DriveController logitech = new DriveController(1, 0, 1, 1, 2, 3, 1, false);
 
     private DriveController controller;
 
-    private JoystickButton printData = controller.rightTriggerButton;
+    private JoystickButton printData;
 
     public OI(DriveController controller) {
 	this.controller = controller;
+	printData = controller.rightTriggerButton;
 	printData.toggleWhenPressed(new PrintDriveData());
     }
 
