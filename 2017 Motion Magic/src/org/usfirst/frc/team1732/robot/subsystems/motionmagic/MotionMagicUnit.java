@@ -94,6 +94,7 @@ public class MotionMagicUnit {
 	// SmartDashboard.putNumber(name + " Vel (inches)", vel *
 	// inchesPerRotation);
 	SmartDashboard.putNumber(name + " Pos (revs)", position);
+	SmartDashboard.putNumber(name + " Pos (inches)", Drivetrain.revToInches(position));
 	// SmartDashboard.putNumber(name + " Pos (inches)", position *
 	// inchesPerRotation);
 	SmartDashboard.putNumber(name + " Setpoint (revs)", setpoint);

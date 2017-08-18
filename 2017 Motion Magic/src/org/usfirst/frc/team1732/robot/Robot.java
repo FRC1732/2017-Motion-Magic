@@ -1,7 +1,7 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import org.usfirst.frc.team1732.robot.commands.testing.MagicMotionTest;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveArc;
 import org.usfirst.frc.team1732.robot.oi.OI;
 import org.usfirst.frc.team1732.robot.robotmaps.RobotMap2017;
 import org.usfirst.frc.team1732.robot.robotmaps.RobotMap2017PracticeBot;
@@ -38,7 +38,8 @@ public class Robot extends IterativeRobot {
 
     @Override
     public void autonomousInit() {
-	autonomousCommand = new MagicMotionTest(80); // get selected command
+	// autonomousCommand = new MagicMotionTest(80); // get selected command
+	autonomousCommand = new DriveArc(DriveArc.degreesToDistance(90, 50), 50, 600, 400, true);
 	// schedule the autonomous command (example)
 	if (autonomousCommand != null)
 	    autonomousCommand.start();

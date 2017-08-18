@@ -15,6 +15,12 @@ public class DriveArc extends Command {
     private final double acceleration;
     private final boolean goLeft;
 
+    public static final double INNER_SCALE = 1.25;
+
+    public DriveArc(double distance, double radius, boolean goLeft) {
+	this(distance, radius, Drivetrain.DEFAULT_VELOCITY, Drivetrain.DEFAULT_ACCELERATION, goLeft);
+    }
+
     public DriveArc(double distance, double radius, double velocity, double acceleration, boolean goLeft) {
 	super();
 	this.distance = distance;
@@ -24,9 +30,15 @@ public class DriveArc extends Command {
 	this.goLeft = goLeft;
     }
 
+    public static double degreesToDistance(double degrees, double radius) {
+	return radius * 2 * Math.PI * degrees / 360.0;
+    }
+
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
+	Robot.drivetrain.setControlMode(TalonControlMode.MotionMagic);
+
 	double outerRadius = radius + Drivetrain.ROBOT_WIDTH_INCHES / 2.0;
 	double innerRadius = radius - Drivetrain.ROBOT_WIDTH_INCHES / 2.0;
 
@@ -53,8 +65,8 @@ public class DriveArc extends Command {
 	double angularCruiseVelocity = rotationalCruiseVelocity * 2 * Math.PI;
 	double angularAcceleration = rotationalAcceleration * 2 * Math.PI;
 
-	double innerVelocity = rotationalCruiseVelocity * circumference(innerRadius);
-	double innerAcceleration = rotationalAcceleration * circumference(innerRadius);
+	double innerVelocity = rotationalCruiseVelocity * circumference(innerRadius) * INNER_SCALE;
+	double innerAcceleration = rotationalAcceleration * circumference(innerRadius) * INNER_SCALE;
 
 	/*
 	 * theoretically, if we did the limit as radius approached infinity all
@@ -83,14 +95,13 @@ public class DriveArc extends Command {
 	    Robot.drivetrain.motionMagic.right.setMotionMagicCruiseVelocity(innerVelocity);
 	    Robot.drivetrain.motionMagic.right.setMotionMagicAcceleration(innerAcceleration);
 
-	    Robot.drivetrain.motionMagic.left.setSetpoint(outerDistance);
 	    Robot.drivetrain.motionMagic.left.setMotionMagicCruiseVelocity(outerVelocity);
+	    Robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(outerAcceleration);
 
 	    Robot.drivetrain.motionMagic.right.setSetpoint(innerDistance);
-	    Robot.drivetrain.motionMagic.left.setMotionMagicAcceleration(outerAcceleration);
+	    Robot.drivetrain.motionMagic.left.setSetpoint(outerDistance);
 	}
 	Robot.drivetrain.motionMagic.resetPositions();
-	Robot.drivetrain.setControlMode(TalonControlMode.MotionMagic);
     }
 
     public static double circumference(double r) {

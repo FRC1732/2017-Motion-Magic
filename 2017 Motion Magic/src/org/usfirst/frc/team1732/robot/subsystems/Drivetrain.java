@@ -49,7 +49,7 @@ public class Drivetrain extends Subsystem {
 
     public static final int ENCODER_CODES_PER_REV = 1365; // = 4096 / 3
     // 4096 counts per encoder revolution, divided by 3 because of gearing
-    public static final double INCHES_PER_REV = 3.911 * Math.PI;
+    public static final double INCHES_PER_REV = 3.473 * Math.PI;
 
     public static final boolean REVERSE_LEFT_ENCODER = true;
     public static final boolean REVERSE_RIGHT_ENCODER = false;
@@ -57,7 +57,8 @@ public class Drivetrain extends Subsystem {
     public static final double MAX_ALLOWED_VELOCITY = 800; // RMP
     public static final double MAX_ALLOWED_ACCELERATION = 800; // RPM/sec
 
-    public static final double MAX_RPM = 830;
+    public static final double MAX_LEFT_RPM = 830;
+    public static final double MAX_RIGHT_RPM = 810;
 
     public static final CANTalon.VelocityMeasurementPeriod VELOCITY_MEASUREMENT_PERIOD = CANTalon.VelocityMeasurementPeriod.Period_1Ms;
     public static final int VELOCITY_MEASUREMENT_WINDOW = 10; // ms
@@ -136,13 +137,14 @@ public class Drivetrain extends Subsystem {
     }
 
     private void setMotionMagicPID() {
-	double p = 0.1 * 1023 / 32_000 * 121; // 0.387
+	double p = 0.1 * 1023 / 32_000 * 400;
 	double i = 0;
-	double d = 0;
-	double f = 1023 / (MAX_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
+	double d = p * 10 * 11;
+	double fLeft = 1023 / (MAX_LEFT_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
+	double fRight = 1023 / (MAX_RIGHT_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
 	// might have different gains for each side
-	leftMaster.setPID(p, i, d, f, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
-	rightMaster.setPID(p, i, d, f, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	leftMaster.setPID(p, i, d, fLeft, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	rightMaster.setPID(p, i, d, fRight, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
     }
 
     public void setControlMode(TalonControlMode mode) {
