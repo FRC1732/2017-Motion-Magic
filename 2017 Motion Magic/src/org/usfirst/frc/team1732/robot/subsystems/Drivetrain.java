@@ -12,6 +12,7 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 
@@ -57,8 +58,7 @@ public class Drivetrain extends Subsystem {
     public static final double MAX_ALLOWED_VELOCITY = 800; // RMP
     public static final double MAX_ALLOWED_ACCELERATION = 800; // RPM/sec
 
-    public static final double MAX_LEFT_RPM = 830;
-    public static final double MAX_RIGHT_RPM = 810;
+    public static final double MAX_RPM = 830;
 
     public static final CANTalon.VelocityMeasurementPeriod VELOCITY_MEASUREMENT_PERIOD = CANTalon.VelocityMeasurementPeriod.Period_1Ms;
     public static final int VELOCITY_MEASUREMENT_WINDOW = 10; // ms
@@ -136,15 +136,48 @@ public class Drivetrain extends Subsystem {
 	talon.setProfile(defaultProfile);
     }
 
+    private final double p = 0.1 * 1023 / 32_000;
+    private final double i = 0;
+    private final double d = p * 10;
+    private final double f = 1023 / (MAX_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
+
+    private final double leftPScale = 400;
+    private final double leftIScale = 1;
+    private final double leftDScale = 11;
+    private final double leftFScale = 1;
+
+    private final double rightPScale = 400;
+    private final double rightIScale = 1;
+    private final double rightDScale = 11;
+    private final double rightFScale = 1;
+
     private void setMotionMagicPID() {
-	double p = 0.1 * 1023 / 32_000 * 400;
-	double i = 0;
-	double d = p * 10 * 11;
-	double fLeft = 1023 / (MAX_LEFT_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
-	double fRight = 1023 / (MAX_RIGHT_RPM / 60.0 / 10.0 * ENCODER_CODES_PER_REV);
+	SmartDashboard.putNumber("Left P scale", leftPScale);
+	SmartDashboard.putNumber("Left I scale", leftIScale);
+	SmartDashboard.putNumber("Left D scale", leftDScale);
+	SmartDashboard.putNumber("Left F scale", leftFScale);
+	SmartDashboard.putNumber("Right P scale", rightPScale);
+	SmartDashboard.putNumber("Right I scale", rightIScale);
+	SmartDashboard.putNumber("Right D scale", rightDScale);
+	SmartDashboard.putNumber("Right F scale", rightFScale);
 	// might have different gains for each side
-	leftMaster.setPID(p, i, d, fLeft, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
-	rightMaster.setPID(p, i, d, fRight, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	leftMaster.setPID(p * leftPScale, i * leftIScale, d * leftDScale, f * leftFScale, IZONE, CLOSED_LOOP_RAMP_RATE,
+		DEFAULT_PROFILE);
+	rightMaster.setPID(p * rightPScale, i * rightIScale, d * rightDScale, f * rightFScale, IZONE,
+		CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+    }
+
+    public void updateMotionMagicPID() {
+	double lp = SmartDashboard.getNumber("Left P scale", leftPScale);
+	double li = SmartDashboard.getNumber("Left I scale", leftIScale);
+	double ld = SmartDashboard.getNumber("Left D scale", leftDScale);
+	double lf = SmartDashboard.getNumber("Left F scale", leftFScale);
+	double rp = SmartDashboard.getNumber("Right P scale", rightPScale);
+	double ri = SmartDashboard.getNumber("Right I scale", rightIScale);
+	double rd = SmartDashboard.getNumber("Right D scale", rightDScale);
+	double rf = SmartDashboard.getNumber("Right F scale", rightFScale);
+	leftMaster.setPID(p * lp, i * li, d * ld, f * lf, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	rightMaster.setPID(p * rp, i * ri, d * ri, f * rf, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
     }
 
     public void setControlMode(TalonControlMode mode) {

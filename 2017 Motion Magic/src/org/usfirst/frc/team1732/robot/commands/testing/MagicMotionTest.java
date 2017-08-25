@@ -30,6 +30,7 @@ public class MagicMotionTest extends Command {
 	Robot.drivetrain.motionMagic.setMotionMagicCruiseVelocity(velocity);
 	Robot.drivetrain.motionMagic.setSetpoint(setpoint);
 	Robot.drivetrain.motionMagic.resetPositions();
+	Robot.drivetrain.updateMotionMagicPID();
     }
 
     // Called repeatedly when this Command is scheduled to run
