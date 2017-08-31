@@ -161,9 +161,9 @@ public class Drivetrain extends Subsystem {
 	SmartDashboard.putNumber("Right D scale", rightDScale);
 	SmartDashboard.putNumber("Right F scale", rightFScale);
 	// might have different gains for each side
-	leftMaster.setPID(p * leftPScale, i * leftIScale, d * leftDScale, f * leftFScale, IZONE, CLOSED_LOOP_RAMP_RATE,
-		DEFAULT_PROFILE);
-	rightMaster.setPID(p * rightPScale, i * rightIScale, d * rightDScale, f * rightFScale, IZONE,
+	leftMaster.setPID(p * leftPScale, i * leftIScale, d * leftDScale * leftPScale, f * leftFScale, IZONE,
+		CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	rightMaster.setPID(p * rightPScale, i * rightIScale, d * rightDScale * rightPScale, f * rightFScale, IZONE,
 		CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
     }
 
@@ -176,8 +176,13 @@ public class Drivetrain extends Subsystem {
 	double ri = SmartDashboard.getNumber("Right I scale", rightIScale);
 	double rd = SmartDashboard.getNumber("Right D scale", rightDScale);
 	double rf = SmartDashboard.getNumber("Right F scale", rightFScale);
-	leftMaster.setPID(p * lp, i * li, d * ld, f * lf, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
-	rightMaster.setPID(p * rp, i * ri, d * ri, f * rf, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	System.out.printf("%.2f %.2f", p * lp, p * rp);
+	System.out.printf("%.2f %.2f", i * li, i * ri);
+	System.out.printf("%.2f %.2f", d * ld, d * rd);
+	System.out.printf("%.2f %.2f", f * lf, f * rf);
+
+	leftMaster.setPID(p * lp, i * li, d * ld * lp, f * lf, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
+	rightMaster.setPID(p * rp, i * ri, d * rd * rp, f * rf, IZONE, CLOSED_LOOP_RAMP_RATE, DEFAULT_PROFILE);
     }
 
     public void setControlMode(TalonControlMode mode) {
