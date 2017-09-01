@@ -1,7 +1,7 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import org.usfirst.frc.team1732.robot.commands.testing.MagicMotionTest;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveArc;
 import org.usfirst.frc.team1732.robot.oi.OI;
 import org.usfirst.frc.team1732.robot.robotmaps.RobotMap2017;
 import org.usfirst.frc.team1732.robot.robotmaps.RobotMap2017PracticeBot;
@@ -14,57 +14,57 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 public class Robot extends IterativeRobot {
 
-    public static RobotMap2017 RobotMap;
-    public static OI oi;
-    public static Drivetrain drivetrain;
+	public static RobotMap2017 RobotMap;
+	public static OI oi;
+	public static Drivetrain drivetrain;
 
-    private Command autonomousCommand;
+	private Command autonomousCommand;
 
-    @Override
-    public void robotInit() {
-	RobotMap = new RobotMap2017PracticeBot();
-	oi = new OI(OI.dualJoystick);
-	drivetrain = new Drivetrain();
-    }
+	@Override
+	public void robotInit() {
+		RobotMap = new RobotMap2017PracticeBot();
+		oi = new OI(OI.dualJoystick);
+		drivetrain = new Drivetrain();
+	}
 
-    @Override
-    public void disabledInit() {
-    }
+	@Override
+	public void disabledInit() {
+	}
 
-    @Override
-    public void disabledPeriodic() {
-	Scheduler.getInstance().run();
-    }
+	@Override
+	public void disabledPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
-    @Override
-    public void autonomousInit() {
-	autonomousCommand = new MagicMotionTest(80); // get selected command
-	// autonomousCommand = new DriveArc(DriveArc.degreesToDistance(90, 50),
-	// 50, 600, 400, true);
-	// schedule the autonomous command (example)
-	if (autonomousCommand != null)
-	    autonomousCommand.start();
-    }
+	@Override
+	public void autonomousInit() {
+		// autonomousCommand = new DriveTimeTest(5, 1);
+		// autonomousCommand = new MagicMotionTest(80); // get selected command
+		autonomousCommand = new DriveArc(DriveArc.degreesToDistance(90, 50), 50, 300, 600, false);
+		// schedule the autonomous command (example)
+		if (autonomousCommand != null)
+			autonomousCommand.start();
+	}
 
-    @Override
-    public void autonomousPeriodic() {
-	Scheduler.getInstance().run();
-    }
+	@Override
+	public void autonomousPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
-    @Override
-    public void teleopInit() {
-	Robot.drivetrain.motionMagic.resetPositions();
-	if (autonomousCommand != null)
-	    autonomousCommand.cancel();
-    }
+	@Override
+	public void teleopInit() {
+		Robot.drivetrain.motionMagic.resetPositions();
+		if (autonomousCommand != null)
+			autonomousCommand.cancel();
+	}
 
-    @Override
-    public void teleopPeriodic() {
-	Scheduler.getInstance().run();
-    }
+	@Override
+	public void teleopPeriodic() {
+		Scheduler.getInstance().run();
+	}
 
-    @Override
-    public void testPeriodic() {
-	LiveWindow.run();
-    }
+	@Override
+	public void testPeriodic() {
+		LiveWindow.run();
+	}
 }

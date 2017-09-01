@@ -9,46 +9,46 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class MagicMotionTest extends Command {
 
-    private static boolean forward = true;
+	private static boolean forward = true;
 
-    public MagicMotionTest(double setpoint) {
-	requires(Robot.drivetrain);
-	this.setpoint = forward ? setpoint : -setpoint;
-	forward = !forward;
-    }
+	public MagicMotionTest(double setpoint) {
+		requires(Robot.drivetrain);
+		this.setpoint = forward ? setpoint : -setpoint;
+	}
 
-    private double setpoint;
+	private double setpoint;
 
-    private double acceleration = Drivetrain.DEFAULT_ACCELERATION;
-    private double velocity = Drivetrain.DEFAULT_VELOCITY;
+	private double acceleration = Drivetrain.DEFAULT_ACCELERATION;
+	private double velocity = Drivetrain.DEFAULT_VELOCITY;
 
-    // Called just before this Command runs the first time
-    @Override
-    protected void initialize() {
-	Robot.drivetrain.setControlMode(TalonControlMode.MotionMagic);
-	Robot.drivetrain.motionMagic.setMotionMagicAcceleration(acceleration);
-	Robot.drivetrain.motionMagic.setMotionMagicCruiseVelocity(velocity);
-	Robot.drivetrain.motionMagic.setSetpoint(setpoint);
-	Robot.drivetrain.motionMagic.resetPositions();
-	Robot.drivetrain.updateMotionMagicPID();
-    }
+	// Called just before this Command runs the first time
+	@Override
+	protected void initialize() {
+		Robot.drivetrain.setControlMode(TalonControlMode.MotionMagic);
+		Robot.drivetrain.motionMagic.setMotionMagicAcceleration(acceleration);
+		Robot.drivetrain.motionMagic.setMotionMagicCruiseVelocity(velocity);
+		Robot.drivetrain.motionMagic.setSetpoint(setpoint);
+		Robot.drivetrain.motionMagic.resetPositions();
+		Robot.drivetrain.updateMotionMagicPID();
+	}
 
-    // Called repeatedly when this Command is scheduled to run
-    @Override
-    protected void execute() {
-	Robot.drivetrain.motionMagic.graphData();
-    }
+	// Called repeatedly when this Command is scheduled to run
+	@Override
+	protected void execute() {
+		Robot.drivetrain.motionMagic.graphData();
+	}
 
-    @Override
-    protected boolean isFinished() {
-	return false;
-    }
+	@Override
+	protected boolean isFinished() {
+		return false;
+	}
 
-    // Called once after isFinished returns true
-    @Override
-    protected void end() {
-	Robot.drivetrain.setControlMode(TalonControlMode.Voltage);
-	Robot.drivetrain.drive(0, 0);
-    }
+	// Called once after isFinished returns true
+	@Override
+	protected void end() {
+		Robot.drivetrain.setControlMode(TalonControlMode.PercentVbus);
+		Robot.drivetrain.drive(0, 0);
+		forward = !forward;
+	}
 
 }
